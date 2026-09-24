@@ -1,0 +1,65 @@
+#!/bin/bash
+# PQC TLS lab: server bootstrap (Amazon Linux 2023). Rendered by Terraform.
+# Progress: /var/log/pqc-lab-bootstrap.log   Done marker: /var/lib/pqc-lab/ready
+set -euo pipefail
+exec > >(tee -a /var/log/pqc-lab-bootstrap.log) 2>&1
+echo "[bootstrap] start $(date -Is)"
+
+REGION="${region}"
+BUCKET="${bucket}"
+BUNDLE_KEY="${bundle_key}"
+LAB_CN="${lab_cn}"
+LOG_GROUP="${log_group}"
+LAB_DIR=/opt/pqc-tls-lab
+
+dnf install -y docker unzip
+systemctl enable --now docker
+
+mkdir -p "$LAB_DIR" /var/lib/pqc-lab
+cd "$LAB_DIR"
+aws s3 cp "s3://$BUCKET/$BUNDLE_KEY" lab.zip --region "$REGION"
+unzip -o -q lab.zip && rm -f lab.zip
+
+# Compiles OpenSSL 3.5.4 + nginx 1.28.0 from pinned source: about 8-12 min on a t4g.small.
+docker build -t pqc-tls-lab:latest .
+
+docker volume create pqc-certs >/dev/null
+docker rm -f pqc-server 2>/dev/null || true
+# nginx's access log (negotiated group per request) goes to CloudWatch Logs via the awslogs
+# driver. The Docker daemon uses the instance role; the container itself cannot reach IMDS.
+docker run -d --name pqc-server --restart unless-stopped \
+  -p 8443-8446:8443-8446 \
+  -e LAB_CN="$LAB_CN" \
+  -v pqc-certs:/etc/pqc-lab/certs \
+  --log-driver awslogs \
+  --log-opt awslogs-region="$REGION" \
+  --log-opt awslogs-group="$LOG_GROUP" \
+  --log-opt awslogs-stream=pqc-server \
+  pqc-tls-lab:latest
+
+# Wait for nginx to answer on the classical endpoint.
+for _ in $(seq 1 60); do
+  if docker exec pqc-server hsbench -n boot -c 127.0.0.1:8444 -N 1 >/dev/null 2>&1; then break; fi
+  sleep 2
+done
+docker exec pqc-server hsbench -n boot -c 127.0.0.1:8444 -N 1 >/dev/null
+
+# Publish the two lab root CAs (public certs only; the keys never leave the container volume)
+# so the scanner can verify the chains.
+for pki in ecdsa mldsa; do
+  docker exec pqc-server cat "/etc/pqc-lab/certs/$pki/ca.crt" > "/var/lib/pqc-lab/$pki-ca.crt"
+  aws s3 cp "/var/lib/pqc-lab/$pki-ca.crt" "s3://$BUCKET/ca/$pki/ca.crt" --region "$REGION"
+done
+
+# Self-check: one handshake per endpoint, logged to the bootstrap log.
+docker exec pqc-server sh -c '
+  C=/etc/pqc-lab/certs
+  hsbench -H
+  hsbench -n classical     -c 127.0.0.1:8444 -N 1 -C $C/ecdsa/ca.crt
+  hsbench -n hybrid        -c 127.0.0.1:8443 -N 1 -C $C/ecdsa/ca.crt
+  hsbench -n hybrid-strict -c 127.0.0.1:8446 -N 1 -C $C/ecdsa/ca.crt -g X25519:X25519MLKEM768
+  hsbench -n pq-only       -c 127.0.0.1:8445 -N 1 -C $C/mldsa/ca.crt -g MLKEM1024
+' || true
+
+date -Is > /var/lib/pqc-lab/ready
+echo "[bootstrap] done $(date -Is)"

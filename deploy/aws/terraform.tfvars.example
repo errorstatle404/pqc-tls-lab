@@ -1,0 +1,13 @@
+# Copy to terraform.tfvars and adjust. Every setting is optional.
+
+region = "us-east-1"
+
+# Cheapest (default): instances in public subnets, outbound only, no inbound from the internet.
+# Set true for private subnets behind a NAT gateway (more realistic, about $33/month extra).
+use_nat_gateway = false
+
+# arm64 (t4g.small) is the cheapest. x86_64 uses t3.small.
+architecture = "arm64"
+
+# Reach the TLS endpoints directly from your laptop (only with use_nat_gateway = false).
+# allowed_cidrs = ["203.0.113.7/32"]

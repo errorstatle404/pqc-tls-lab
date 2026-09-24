@@ -1,0 +1,36 @@
+name: pqc-tls-lab
+
+services:
+  pqc-server:
+    build: .
+    image: pqc-tls-lab:latest
+    container_name: pqc-server
+    hostname: pqc-server
+    ports:
+      - "8443:8443"   # hybrid (X25519MLKEM768 preferred)
+      - "8444:8444"   # classical baseline
+      - "8445:8445"   # pure PQ (ML-KEM-1024 + ML-DSA-65)
+      - "8446:8446"   # hybrid, strictly enforced
+    volumes:
+      - certs:/etc/pqc-lab/certs
+    healthcheck:
+      test: ["CMD", "hsbench", "-n", "hc", "-c", "127.0.0.1:8444", "-N", "1"]
+      interval: 5s
+      retries: 10
+
+  pqc-client:
+    image: pqc-tls-lab:latest
+    container_name: pqc-client
+    command: ["sleep", "infinity"]
+    depends_on:
+      pqc-server:
+        condition: service_healthy
+    cap_add:
+      - NET_ADMIN        # only needed for `make bench-wan` (tc netem) and `make capture`
+      - NET_RAW
+    volumes:
+      - certs:/etc/pqc-lab/certs:ro
+      - ./results:/results
+
+volumes:
+  certs:

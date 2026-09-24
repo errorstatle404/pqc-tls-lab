@@ -1,0 +1,130 @@
+#!/bin/bash
+# PQC TLS lab: scanner bootstrap (Amazon Linux 2023). Rendered by Terraform.
+# Progress: /var/log/pqc-lab-bootstrap.log   Done marker: /var/lib/pqc-lab/ready
+set -euo pipefail
+exec > >(tee -a /var/log/pqc-lab-bootstrap.log) 2>&1
+echo "[bootstrap] start $(date -Is)"
+
+REGION="${region}"
+BUCKET="${bucket}"
+BUNDLE_KEY="${bundle_key}"
+SERVER="${server_fqdn}"
+LAB_DIR=/opt/pqc-tls-lab
+
+dnf install -y docker unzip
+systemctl enable --now docker
+
+mkdir -p "$LAB_DIR/results" /var/lib/pqc-lab /etc/pqc-lab/certs/ecdsa /etc/pqc-lab/certs/mldsa
+cd "$LAB_DIR"
+aws s3 cp "s3://$BUCKET/$BUNDLE_KEY" lab.zip --region "$REGION"
+unzip -o -q lab.zip && rm -f lab.zip
+
+# Same image as the server: hsbench, sigbench and the OpenSSL 3.5 CLI.
+docker build -t pqc-tls-lab:latest .
+
+cat > /etc/pqc-lab/env <<EOF
+REGION=$REGION
+BUCKET=$BUCKET
+SERVER=$SERVER
+LAB_DIR=$LAB_DIR
+EOF
+
+# ---------------- pqc-lab helper ----------------
+cat > /usr/local/bin/pqc-lab <<'HELPER'
+#!/bin/bash
+# pqc-lab: run the PQC TLS lab benchmarks from the scanner.
+set -euo pipefail
+[ "$(id -u)" = 0 ] || exec sudo "$0" "$@"
+. /etc/pqc-lab/env
+
+need_ready() {
+  [ -f /var/lib/pqc-lab/ready ] || {
+    echo "Still bootstrapping (building the image and waiting for the server)."
+    echo "Follow along with:  sudo tail -f /var/log/pqc-lab-bootstrap.log"
+    exit 2
+  }
+}
+
+refresh_ca() { # pull the server's current lab CAs (they change if the server is replaced)
+  for pki in ecdsa mldsa; do
+    aws s3 cp --only-show-errors "s3://$BUCKET/ca/$pki/ca.crt" "/etc/pqc-lab/certs/$pki/ca.crt" --region "$REGION"
+  done
+}
+
+client() { docker exec -e SERVER="$SERVER" "$@"; }
+
+cmd="$${1:-}"; [ "$#" -gt 0 ] && shift
+case "$cmd" in
+  status)
+    if [ -f /var/lib/pqc-lab/ready ]; then echo "ready since $(cat /var/lib/pqc-lab/ready)"; else echo "bootstrapping"; fi
+    echo "server: $SERVER -> $(getent hosts "$SERVER" | awk '{print $1}')"
+    ;;
+  smoke)
+    need_ready; refresh_ca
+    for p in 8443 8444 8446; do
+      client pqc-client sh -c "printf 'GET / HTTP/1.0\r\n\r\n' | openssl s_client -quiet -verify_quiet -connect \$SERVER:$p -CAfile /etc/pqc-lab/certs/ecdsa/ca.crt 2>/dev/null | tail -1"
+    done
+    client pqc-client sh -c "printf 'GET / HTTP/1.0\r\n\r\n' | openssl s_client -quiet -verify_quiet -connect \$SERVER:8445 -groups MLKEM1024 -CAfile /etc/pqc-lab/certs/mldsa/ca.crt 2>/dev/null | tail -1"
+    ;;
+  bench)
+    need_ready; refresh_ca
+    client -e N="$${N:-200}" pqc-client run-bench.sh
+    ;;
+  bench-wan)
+    need_ready; refresh_ca
+    client -e N="$${N:-50}" -e DELAY_MS="$${DELAY_MS:-25}" pqc-client run-bench.sh
+    ;;
+  capture)
+    need_ready; refresh_ca
+    client pqc-client capture.sh
+    ;;
+  upload)
+    stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+    aws s3 cp --recursive --only-show-errors "$LAB_DIR/results" "s3://$BUCKET/results/$stamp/" --region "$REGION"
+    echo "uploaded to s3://$BUCKET/results/$stamp/"
+    ;;
+  shell)
+    need_ready
+    docker exec -it -e SERVER="$SERVER" pqc-client sh
+    ;;
+  *)
+    echo "usage: pqc-lab {status|smoke|bench|bench-wan|capture|upload|shell}"
+    echo "  env: N (handshakes per scenario), DELAY_MS (bench-wan only)"
+    exit 1
+    ;;
+esac
+HELPER
+chmod 755 /usr/local/bin/pqc-lab
+
+# Wait for the server to publish its CA certs (it builds the same image in parallel).
+echo "[bootstrap] waiting for the server's CA certificates in s3://$BUCKET/ca/"
+for i in $(seq 1 180); do
+  if aws s3api head-object --bucket "$BUCKET" --key ca/mldsa/ca.crt --region "$REGION" >/dev/null 2>&1; then
+    break
+  fi
+  [ "$i" = 180 ] && { echo "[bootstrap] gave up waiting for the server after 45 min"; exit 1; }
+  sleep 15
+done
+for pki in ecdsa mldsa; do
+  aws s3 cp "s3://$BUCKET/ca/$pki/ca.crt" "/etc/pqc-lab/certs/$pki/ca.crt" --region "$REGION"
+done
+
+docker rm -f pqc-client 2>/dev/null || true
+# Bridge network (not host) so the container's interface is eth0, which run-bench.sh
+# (tc netem) and capture.sh (tcpdump) expect.
+docker run -d --name pqc-client --restart unless-stopped \
+  --cap-add NET_ADMIN --cap-add NET_RAW \
+  -e SERVER="$SERVER" \
+  -v /etc/pqc-lab/certs:/etc/pqc-lab/certs:ro \
+  -v "$LAB_DIR/results":/results \
+  pqc-tls-lab:latest sleep infinity
+
+# Confirm the private DNS name resolves and the server answers from here.
+for _ in $(seq 1 30); do
+  if docker exec pqc-client hsbench -n boot -c "$SERVER:8444" -N 1 -C /etc/pqc-lab/certs/ecdsa/ca.crt >/dev/null 2>&1; then break; fi
+  sleep 5
+done
+docker exec pqc-client hsbench -n boot -c "$SERVER:8444" -N 1 -C /etc/pqc-lab/certs/ecdsa/ca.crt
+
+date -Is > /var/lib/pqc-lab/ready
+echo "[bootstrap] done $(date -Is). Run: sudo pqc-lab bench"
