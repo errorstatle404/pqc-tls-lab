@@ -1,0 +1,3 @@
+# Runtime: AWS SDK and the CycloneDX library (used to validate the CBOM against the official schema).
+boto3>=1.34
+cyclonedx-python-lib[json-validation]>=7,<12

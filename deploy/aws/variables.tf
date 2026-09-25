@@ -61,6 +61,12 @@ variable "create_scanner" {
   default     = true
 }
 
+variable "create_inventory_targets" {
+  description = "Create extra targets for the crypto inventory: an internal ALB with a legacy and a post-quantum HTTPS listener, and two KMS signing keys (ECDSA P-256 and ML-DSA-65). About 3 cents an hour."
+  type        = bool
+  default     = true
+}
+
 variable "allowed_cidrs" {
   description = <<-EOT
     Extra IPv4 CIDRs allowed to reach the TLS endpoints (ports 8443-8446), for example your own
@@ -83,7 +89,7 @@ variable "private_domain" {
 }
 
 variable "log_retention_days" {
-  description = "How long CloudWatch keeps the nginx access log (which records the negotiated group of every handshake)."
+  description = "How long CloudWatch keeps the nginx access log (which records the negotiated group of every HTTP request; a bare handshake with no request is not logged)."
   type        = number
   default     = 14
 }

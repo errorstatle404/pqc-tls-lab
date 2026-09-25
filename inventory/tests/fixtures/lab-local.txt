@@ -1,0 +1,433 @@
+### OPENSSL OpenSSL 3.5.4 30 Sep 2025 (Library: OpenSSL 3.5.4 30 Sep 2025)
+### PROBE 1 pqc-server 8443 pq-default
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0602], ClientHello
+<<< TLS 1.3, Handshake [length 04ba], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Negotiated TLS1.3 group: X25519MLKEM768
+SSL handshake has read 2471 bytes and written 1623 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 1
+### PROBE 2 pqc-server 8443 hybrid-late
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0132], ClientHello
+<<< TLS 1.3, Handshake [length 007a], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Peer Temp Key: X25519, 253 bits
+SSL handshake has read 1397 bytes and written 391 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 2
+### PROBE 3 pqc-server 8443 classical
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0134], ClientHello
+<<< TLS 1.3, Handshake [length 007a], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Peer Temp Key: X25519, 253 bits
+SSL handshake has read 1396 bytes and written 393 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+<<< TLS 1.3, Alert [length 0002], warning close_notify
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 3
+### PROBE 4 pqc-server 8443 hybrid-only
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 05cc], ClientHello
+<<< TLS 1.3, Handshake [length 04ba], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Negotiated TLS1.3 group: X25519MLKEM768
+SSL handshake has read 2472 bytes and written 1569 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+<<< TLS 1.3, Alert [length 0002], warning close_notify
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 4
+### PROBE 5 pqc-server 8443 pq-only
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 072c], ClientHello
+<<< TLS 1.3, Alert [length 0002], fatal handshake_failure
+801BD6CD2B7F0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:ssl/record/rec_layer_s3.c:916:SSL alert number 40
+Negotiated TLS1.3 group: <NULL>
+SSL handshake has read 7 bytes and written 1841 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.3
+Verify return code: 0 (ok)
+### END 5
+### PROBE 6 pqc-server 8443 tls12
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.2, Handshake [length 00cd], ClientHello
+<<< TLS 1.2, Alert [length 0002], fatal protocol_version
+804BF694B27F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:ssl/record/rec_layer_s3.c:916:SSL alert number 70
+SSL handshake has read 7 bytes and written 210 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.2
+### END 6
+### PROBE 7 pqc-server 8444 pq-default
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0602], ClientHello
+<<< TLS 1.3, Handshake [length 007a], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Peer Temp Key: X25519, 253 bits
+SSL handshake has read 1385 bytes and written 1623 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+<<< TLS 1.3, Alert [length 0002], warning close_notify
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 7
+### PROBE 8 pqc-server 8444 hybrid-late
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0132], ClientHello
+<<< TLS 1.3, Handshake [length 007a], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Peer Temp Key: X25519, 253 bits
+SSL handshake has read 1384 bytes and written 391 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+<<< TLS 1.3, Alert [length 0002], warning close_notify
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 8
+### PROBE 9 pqc-server 8444 classical
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0134], ClientHello
+<<< TLS 1.3, Handshake [length 007a], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Peer Temp Key: X25519, 253 bits
+SSL handshake has read 1384 bytes and written 393 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+<<< TLS 1.3, Alert [length 0002], warning close_notify
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 9
+### PROBE 10 pqc-server 8444 hybrid-only
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 05cc], ClientHello
+<<< TLS 1.3, Alert [length 0002], fatal handshake_failure
+80BBD5FCDF7F0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:ssl/record/rec_layer_s3.c:916:SSL alert number 40
+Negotiated TLS1.3 group: <NULL>
+SSL handshake has read 7 bytes and written 1489 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.3
+Verify return code: 0 (ok)
+### END 10
+### PROBE 11 pqc-server 8444 pq-only
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 072c], ClientHello
+<<< TLS 1.3, Alert [length 0002], fatal handshake_failure
+800BFC2F7D7F0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:ssl/record/rec_layer_s3.c:916:SSL alert number 40
+Negotiated TLS1.3 group: <NULL>
+SSL handshake has read 7 bytes and written 1841 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.3
+Verify return code: 0 (ok)
+### END 11
+### PROBE 12 pqc-server 8444 tls12
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.2, Handshake [length 00cd], ClientHello
+<<< TLS 1.2, Alert [length 0002], fatal protocol_version
+80DBF4AE867F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:ssl/record/rec_layer_s3.c:916:SSL alert number 70
+SSL handshake has read 7 bytes and written 210 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.2
+### END 12
+### PROBE 13 pqc-server 8445 pq-default
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0602], ClientHello
+<<< TLS 1.3, Alert [length 0002], fatal handshake_failure
+800B4D5CBE7F0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:ssl/record/rec_layer_s3.c:916:SSL alert number 40
+Negotiated TLS1.3 group: <NULL>
+SSL handshake has read 7 bytes and written 1543 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.3
+Verify return code: 0 (ok)
+### END 13
+### PROBE 14 pqc-server 8445 hybrid-late
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0132], ClientHello
+<<< TLS 1.3, Alert [length 0002], fatal handshake_failure
+803B9318EC7F0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:ssl/record/rec_layer_s3.c:916:SSL alert number 40
+Negotiated TLS1.3 group: <NULL>
+SSL handshake has read 7 bytes and written 311 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.3
+Verify return code: 0 (ok)
+### END 14
+### PROBE 15 pqc-server 8445 classical
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0134], ClientHello
+<<< TLS 1.3, Alert [length 0002], fatal handshake_failure
+808B42EF1B7F0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:ssl/record/rec_layer_s3.c:916:SSL alert number 40
+Negotiated TLS1.3 group: <NULL>
+SSL handshake has read 7 bytes and written 313 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.3
+Verify return code: 0 (ok)
+### END 15
+### PROBE 16 pqc-server 8445 hybrid-only
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 05cc], ClientHello
+<<< TLS 1.3, Alert [length 0002], fatal handshake_failure
+80DBBB80C87F0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:ssl/record/rec_layer_s3.c:916:SSL alert number 40
+Negotiated TLS1.3 group: <NULL>
+SSL handshake has read 7 bytes and written 1489 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.3
+Verify return code: 0 (ok)
+### END 16
+### PROBE 17 pqc-server 8445 pq-only
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 072c], ClientHello
+<<< TLS 1.3, Handshake [length 067a], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (mldsa)
+   a:PKEY: ML-DSA-65, 15616 (bit); sigalg: ML-DSA-65
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (mldsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (mldsa)
+   a:PKEY: ML-DSA-65, 15616 (bit); sigalg: ML-DSA-65
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: mldsa65
+Negotiated TLS1.3 group: MLKEM1024
+SSL handshake has read 16409 bytes and written 1921 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 17
+### PROBE 18 pqc-server 8445 tls12
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.2, Handshake [length 00cd], ClientHello
+<<< TLS 1.2, Alert [length 0002], fatal protocol_version
+806B3522497F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:ssl/record/rec_layer_s3.c:916:SSL alert number 70
+SSL handshake has read 7 bytes and written 210 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.2
+### END 18
+### PROBE 19 pqc-server 8446 pq-default
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0602], ClientHello
+<<< TLS 1.3, Handshake [length 04ba], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Negotiated TLS1.3 group: X25519MLKEM768
+SSL handshake has read 2471 bytes and written 1623 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 19
+### PROBE 20 pqc-server 8446 hybrid-late
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0132], ClientHello
+<<< TLS 1.3, Handshake [length 0058], ServerHello
+>>> TLS 1.3, Handshake [length 05d2], ClientHello
+<<< TLS 1.3, Handshake [length 04ba], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Negotiated TLS1.3 group: X25519MLKEM768
+SSL handshake has read 2565 bytes and written 1886 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 20
+### PROBE 21 pqc-server 8446 classical
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 0134], ClientHello
+<<< TLS 1.3, Handshake [length 007a], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Peer Temp Key: X25519, 253 bits
+SSL handshake has read 1396 bytes and written 393 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 21
+### PROBE 22 pqc-server 8446 hybrid-only
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 05cc], ClientHello
+<<< TLS 1.3, Handshake [length 04ba], ServerHello
+verify error:num=19:self-signed certificate in certificate chain
+ 0 s:O=PQC TLS Lab, CN=pqc-server
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+ 1 s:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   i:O=PQC TLS Lab, CN=PQC Lab Root CA (ecdsa)
+   a:PKEY: EC, (prime256v1); sigalg: ecdsa-with-SHA256
+   v:NotBefore: Sep 25 10:20:09 2026 GMT; NotAfter: Dec 28 10:20:09 2028 GMT
+Peer signature type: ecdsa_secp256r1_sha256
+Negotiated TLS1.3 group: X25519MLKEM768
+SSL handshake has read 2472 bytes and written 1569 bytes
+Verification error: self-signed certificate in certificate chain
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Verify return code: 19 (self-signed certificate in certificate chain)
+>>> TLS 1.3, Alert [length 0002], warning close_notify
+### END 22
+### PROBE 23 pqc-server 8446 pq-only
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.3, Handshake [length 072c], ClientHello
+<<< TLS 1.3, Alert [length 0002], fatal handshake_failure
+80AB4B00897F0000:error:0A000410:SSL routines:ssl3_read_bytes:ssl/tls alert handshake failure:ssl/record/rec_layer_s3.c:916:SSL alert number 40
+Negotiated TLS1.3 group: <NULL>
+SSL handshake has read 7 bytes and written 1841 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.3
+Verify return code: 0 (ok)
+### END 23
+### PROBE 24 pqc-server 8446 tls12
+Connecting to 127.0.0.1
+CONNECTED(00000003)
+>>> TLS 1.2, Handshake [length 00cd], ClientHello
+<<< TLS 1.2, Alert [length 0002], fatal protocol_version
+80CBFAAAB77F0000:error:0A00042E:SSL routines:ssl3_read_bytes:tlsv1 alert protocol version:ssl/record/rec_layer_s3.c:916:SSL alert number 70
+SSL handshake has read 7 bytes and written 210 bytes
+Verification: OK
+New, (NONE), Cipher is (NONE)
+Protocol: TLSv1.2
+### END 24
+### DONE

@@ -1,0 +1,26 @@
+{
+  "_comment": "What a correct inventory should report for the Docker lab (docker-compose.yml). Same shape as the Terraform output inventory_ground_truth.",
+  "host": "pqc-server",
+  "endpoints": {
+    "8443": {
+      "name": "hybrid (preferred)",
+      "inventory_class": "hybrid-downgradable",
+      "expected_default_client": "X25519MLKEM768"
+    },
+    "8444": {
+      "name": "classical",
+      "inventory_class": "classical",
+      "expected_default_client": "x25519"
+    },
+    "8445": {
+      "name": "pure post-quantum",
+      "inventory_class": "pq-only",
+      "expected_default_client": "handshake_failure"
+    },
+    "8446": {
+      "name": "hybrid (strict, HelloRetryRequest)",
+      "inventory_class": "hybrid-enforced",
+      "expected_default_client": "X25519MLKEM768"
+    }
+  }
+}

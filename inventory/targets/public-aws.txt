@@ -1,0 +1,24 @@
+# Public AWS endpoints for `make inventory-public`: what AWS itself negotiates today.
+# Format: host[:port] [name]. Port defaults to 443. Lines starting with # are ignored.
+#
+# AWS says KMS, ACM and Secrets Manager support hybrid ML-KEM on their non-FIPS endpoints,
+# and that CloudFront enables it for viewers by default. The rest are here to find out.
+
+kms.us-east-1.amazonaws.com KMS
+kms-fips.us-east-1.amazonaws.com KMS (FIPS endpoint)
+acm.us-east-1.amazonaws.com ACM
+secretsmanager.us-east-1.amazonaws.com Secrets Manager
+secretsmanager-fips.us-east-1.amazonaws.com Secrets Manager (FIPS endpoint)
+sts.us-east-1.amazonaws.com STS
+iam.amazonaws.com IAM
+s3.us-east-1.amazonaws.com S3
+ec2.us-east-1.amazonaws.com EC2
+ssm.us-east-1.amazonaws.com Systems Manager
+lambda.us-east-1.amazonaws.com Lambda
+dynamodb.us-east-1.amazonaws.com DynamoDB
+sqs.us-east-1.amazonaws.com SQS
+logs.us-east-1.amazonaws.com CloudWatch Logs
+signin.aws.amazon.com Console sign-in
+console.aws.amazon.com Console
+aws.amazon.com aws.amazon.com (CloudFront)
+d1.awsstatic.com AWS static content (CloudFront)

@@ -70,6 +70,9 @@ data "archive_file" "lab" {
     "results/**",
     "**/*.pcap",
     "**/.DS_Store",
+    ".venv/**", # the inventory tool's Python env (make inventory-setup) stays on your laptop
+    "**/__pycache__/**",
+    "**/.pytest_cache/**",
   ]
 }
 
@@ -80,7 +83,7 @@ resource "aws_s3_object" "bundle" {
   etag   = data.archive_file.lab.output_md5
 }
 
-# ---- CloudWatch: nginx access log with the negotiated group of every handshake ----
+# ---- CloudWatch: nginx access log with the negotiated group of every request ----
 
 resource "aws_cloudwatch_log_group" "nginx" {
   name              = "/${var.name}/nginx"

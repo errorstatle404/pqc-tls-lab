@@ -4,8 +4,13 @@ terraform {
 
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = ">= 5.80, < 7.0"
+      source = "hashicorp/aws"
+      # 6.2 added ML_DSA_65 as a KMS key spec.
+      version = ">= 6.2, < 7.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
     }
     archive = {
       source  = "hashicorp/archive"

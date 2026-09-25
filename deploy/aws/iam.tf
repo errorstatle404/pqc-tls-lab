@@ -93,6 +93,13 @@ resource "aws_iam_role_policy" "scanner" {
         Condition = { StringLike = { "s3:prefix" = ["ca/*"] } }
       },
       {
+        # make aws-inventory drops its probe script here and runs it through SSM.
+        Sid      = "ReadInventoryJobs"
+        Effect   = "Allow"
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.lab.arn}/inventory-jobs/*"
+      },
+      {
         Sid      = "UploadResults"
         Effect   = "Allow"
         Action   = "s3:PutObject"

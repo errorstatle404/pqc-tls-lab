@@ -103,18 +103,32 @@ client/sigbench.c       signature benchmark
 scripts/run-bench.sh    scenario matrix → results/*.csv, *.md
 scripts/capture.sh      pcap for Wireshark
 docs/sample-results.md  reference run
-deploy/aws/              Terraform: VPC + server + scanner, SSM access, negotiated-group log in CloudWatch
+deploy/aws/             Terraform: VPC + server + scanner, SSM access, negotiated-group log in CloudWatch,
+                        plus inventory targets (internal ALB with legacy + PQ listeners, KMS keys)
+inventory/              crypto inventory: AWS API read + TLS probes -> report, CBOM, score
 ```
 
 ## Run it in AWS
 
-[`deploy/aws/`](deploy/aws/README.md) is a Terraform module that puts the server in its own VPC, behind the private DNS name `pqc-server.lab.internal`. A scanner instance in a second Availability Zone runs the same benchmarks across a real network. nginx's per-handshake `group=` log goes to CloudWatch, and the module outputs the ground truth a crypto inventory should report for each endpoint.
+[`deploy/aws/`](deploy/aws/README.md) is a Terraform module that puts the server in its own VPC, behind the private DNS name `pqc-server.lab.internal`. A scanner instance in a second Availability Zone runs the same benchmarks across a real network. nginx's access log, which records the negotiated `group=` of every request, goes to CloudWatch, and the module outputs the ground truth a crypto inventory should report for each endpoint.
 
 ```bash
 make aws-test    # offline tests, mocked AWS provider
-make aws-up      # about 15 min until ready; roughly 5 cents an hour
+make aws-up      # about 15 min until ready; roughly 8 cents an hour
 make aws-bench   # results/aws/<timestamp>/
 make aws-down
+```
+
+## Crypto inventory
+
+[`inventory/`](inventory/README.md) is a tool that finds the cryptography in an AWS account and reports what's quantum-ready. It reads the configuration through the AWS APIs (ACM certificates, load balancer TLS policies, CloudFront, KMS keys, servers with open TLS ports). It then probes every TLS endpoint as six kinds of client, because configuration alone misses the silent downgrade from finding 2. It writes a findings report and a CycloneDX 1.6 CBOM (Cryptography Bill of Materials), and scores itself against the lab's known answers.
+
+```bash
+make inventory-setup    # one-time Python environment
+make inventory-test     # unit tests
+make inventory-local    # the Docker lab: 8/8 checks against the known answers
+make inventory-public   # what AWS's own public endpoints negotiate today
+make aws-inventory      # the AWS lab (after make aws-up)
 ```
 
 
