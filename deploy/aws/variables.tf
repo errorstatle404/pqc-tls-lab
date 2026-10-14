@@ -61,12 +61,6 @@ variable "create_scanner" {
   default     = true
 }
 
-variable "create_inventory_targets" {
-  description = "Create extra targets for the crypto inventory: an internal ALB with a legacy and a post-quantum HTTPS listener, and two KMS signing keys (ECDSA P-256 and ML-DSA-65). About 3 cents an hour."
-  type        = bool
-  default     = true
-}
-
 variable "allowed_cidrs" {
   description = <<-EOT
     Extra IPv4 CIDRs allowed to reach the TLS endpoints (ports 8443-8446), for example your own
@@ -89,7 +83,7 @@ variable "private_domain" {
 }
 
 variable "log_retention_days" {
-  description = "How long CloudWatch keeps the nginx access log (which records the negotiated group of every HTTP request; a bare handshake with no request is not logged)."
+  description = "How long CloudWatch keeps the nginx access log (which records the negotiated group of every HTTP request; inventory probes send one request per connection)."
   type        = number
   default     = 14
 }
@@ -98,4 +92,20 @@ variable "lab_source_dir" {
   description = "Path to the lab repository root that gets bundled and uploaded. Defaults to the repo this module lives in."
   type        = string
   default     = null
+}
+
+variable "create_load_balancer" {
+  description = <<-EOT
+    Create an internal Application Load Balancer in front of the lab server, with one listener on the
+    AWS API-default TLS policy (no PQ, TLS 1.0-1.2) and one on a hybrid post-quantum policy, plus an
+    imported ACM certificate. Gives the crypto inventory AWS-managed TLS to find. About $0.03/hour extra.
+  EOT
+  type        = bool
+  default     = true
+}
+
+variable "create_kms_keys" {
+  description = "Create two KMS signing keys for the inventory to find: RSA_3072 (classical) and ML_DSA_65 (post-quantum). About $1/month each, prorated hourly."
+  type        = bool
+  default     = true
 }

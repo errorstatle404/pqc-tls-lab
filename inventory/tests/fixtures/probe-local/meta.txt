@@ -1,0 +1,4 @@
+when=2026-09-24T20:37:28Z
+scanner=test-bed
+openssl=OpenSSL 3.5.4 30 Sep 2025 (Library: OpenSSL 3.5.4 30 Sep 2025)
+targets_file=inventory/targets/local-lab.txt

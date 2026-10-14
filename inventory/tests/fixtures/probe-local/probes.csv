@@ -1,0 +1,31 @@
+scenario,target,client_groups,result,group,hrr,peer_sig,clienthello_B,serverhello_B,certificate_B,certverify_B,bytes_c2s,bytes_s2c,median_ms,p95_ms,n
+lab-classical|default,127.0.0.1:8444,(default),ok,x25519,no,ecdsa_secp256r1_sha256,1461,122,1031,79,1570,1393,1.608,1.608,1
+lab-classical|classical-only,127.0.0.1:8444,X25519:P-256:P-384,ok,x25519,no,ecdsa_secp256r1_sha256,231,122,1031,79,340,1393,1.523,1.523,1
+lab-classical|hybrid-only,127.0.0.1:8444,X25519MLKEM768:SecP256r1MLKEM768:SecP384r1MLKEM1024,FAIL: ssl/tls alert handshake failure,-,no,-,1407,0,0,0,1412,7,0.000,0.000,0
+lab-classical|classical-first,127.0.0.1:8444,X25519:X25519MLKEM768:SecP256r1MLKEM768,ok,x25519,no,ecdsa_secp256r1_sha256,231,122,1031,79,340,1393,1.415,1.415,1
+lab-classical|pq-only,127.0.0.1:8444,MLKEM768:MLKEM1024,FAIL: ssl/tls alert handshake failure,-,no,-,1373,0,0,0,1378,7,0.000,0.000,0
+lab-hybrid|default,127.0.0.1:8443,(default),ok,X25519MLKEM768,no,ecdsa_secp256r1_sha256,1461,1210,1031,79,1570,2481,1.794,1.794,1
+lab-hybrid|classical-only,127.0.0.1:8443,X25519:P-256:P-384,ok,x25519,no,ecdsa_secp256r1_sha256,231,122,1031,80,340,1406,1.424,1.424,1
+lab-hybrid|hybrid-only,127.0.0.1:8443,X25519MLKEM768:SecP256r1MLKEM768:SecP384r1MLKEM1024,ok,X25519MLKEM768,no,ecdsa_secp256r1_sha256,1407,1210,1031,80,1516,2482,1.683,1.683,1
+lab-hybrid|classical-first,127.0.0.1:8443,X25519:X25519MLKEM768:SecP256r1MLKEM768,ok,x25519,no,ecdsa_secp256r1_sha256,231,122,1031,80,340,1406,1.400,1.400,1
+lab-hybrid|pq-only,127.0.0.1:8443,MLKEM768:MLKEM1024,FAIL: ssl/tls alert handshake failure,-,no,-,1373,0,0,0,1378,7,0.000,0.000,0
+lab-hybrid-strict|default,127.0.0.1:8446,(default),ok,X25519MLKEM768,no,ecdsa_secp256r1_sha256,1461,1210,1031,79,1570,2481,2.231,2.231,1
+lab-hybrid-strict|classical-only,127.0.0.1:8446,X25519:P-256:P-384,ok,x25519,no,ecdsa_secp256r1_sha256,231,122,1031,79,340,1405,1.548,1.548,1
+lab-hybrid-strict|hybrid-only,127.0.0.1:8446,X25519MLKEM768:SecP256r1MLKEM768:SecP384r1MLKEM1024,ok,X25519MLKEM768,no,ecdsa_secp256r1_sha256,1407,1210,1031,79,1516,2481,1.640,1.640,1
+lab-hybrid-strict|classical-first,127.0.0.1:8446,X25519:X25519MLKEM768:SecP256r1MLKEM768,ok,X25519MLKEM768,yes,ecdsa_secp256r1_sha256,1646,1210,1031,79,1760,2574,1.771,1.771,1
+lab-hybrid-strict|pq-only,127.0.0.1:8446,MLKEM768:MLKEM1024,FAIL: ssl/tls alert handshake failure,-,no,-,1373,0,0,0,1378,7,0.000,0.000,0
+lab-pq-only|default,127.0.0.1:8445,(default),FAIL: ssl/tls alert handshake failure,-,no,-,1461,0,0,0,1466,7,0.000,0.000,0
+lab-pq-only|classical-only,127.0.0.1:8445,X25519:P-256:P-384,FAIL: ssl/tls alert handshake failure,-,no,-,231,0,0,0,236,7,0.000,0.000,0
+lab-pq-only|hybrid-only,127.0.0.1:8445,X25519MLKEM768:SecP256r1MLKEM768:SecP384r1MLKEM1024,FAIL: ssl/tls alert handshake failure,-,no,-,1407,0,0,0,1412,7,0.000,0.000,0
+lab-pq-only|classical-first,127.0.0.1:8445,X25519:X25519MLKEM768:SecP256r1MLKEM768,FAIL: ssl/tls alert handshake failure,-,no,-,231,0,0,0,236,7,0.000,0.000,0
+lab-pq-only|pq-only,127.0.0.1:8445,MLKEM768:MLKEM1024,ok,MLKEM1024,yes,mldsa65,3130,1658,11279,3317,3244,16508,2.595,2.595,1
+legacy|default,127.0.0.1:8447,(default),FAIL: tlsv1 alert protocol version,-,no,-,1460,0,0,0,1465,7,0.000,0.000,0
+legacy|classical-only,127.0.0.1:8447,X25519:P-256:P-384,FAIL: tlsv1 alert protocol version,-,no,-,230,0,0,0,235,7,0.000,0.000,0
+legacy|hybrid-only,127.0.0.1:8447,X25519MLKEM768:SecP256r1MLKEM768:SecP384r1MLKEM1024,FAIL: tlsv1 alert protocol version,-,no,-,1406,0,0,0,1411,7,0.000,0.000,0
+legacy|classical-first,127.0.0.1:8447,X25519:X25519MLKEM768:SecP256r1MLKEM768,FAIL: tlsv1 alert protocol version,-,no,-,230,0,0,0,235,7,0.000,0.000,0
+legacy|pq-only,127.0.0.1:8447,MLKEM768:MLKEM1024,FAIL: tlsv1 alert protocol version,-,no,-,1372,0,0,0,1377,7,0.000,0.000,0
+closed-port|default,127.0.0.1:8449,(default),tcp-connect-failed,-,no,-,0,0,0,0,0,0,0.000,0.000,0
+closed-port|classical-only,127.0.0.1:8449,X25519:P-256:P-384,tcp-connect-failed,-,no,-,0,0,0,0,0,0,0.000,0.000,0
+closed-port|hybrid-only,127.0.0.1:8449,X25519MLKEM768:SecP256r1MLKEM768:SecP384r1MLKEM1024,tcp-connect-failed,-,no,-,0,0,0,0,0,0,0.000,0.000,0
+closed-port|classical-first,127.0.0.1:8449,X25519:X25519MLKEM768:SecP256r1MLKEM768,tcp-connect-failed,-,no,-,0,0,0,0,0,0,0.000,0.000,0
+closed-port|pq-only,127.0.0.1:8449,MLKEM768:MLKEM1024,tcp-connect-failed,-,no,-,0,0,0,0,0,0,0.000,0.000,0

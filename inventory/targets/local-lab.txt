@@ -1,0 +1,5 @@
+# The local Docker lab (make up). host port sni label
+pqc-server 8444 pqc-lab.local lab-classical
+pqc-server 8443 pqc-lab.local lab-hybrid
+pqc-server 8446 pqc-lab.local lab-hybrid-strict
+pqc-server 8445 pqc-lab.local lab-pq-only

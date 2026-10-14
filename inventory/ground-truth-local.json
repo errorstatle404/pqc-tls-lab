@@ -1,0 +1,13 @@
+{
+  "description": "Known answers for the local Docker lab (make up). Used by `make inventory-local` to score the inventory.",
+  "endpoints": [
+    {"host": "pqc-server", "port": 8444, "name": "classical",
+     "expected_posture": "none", "expected_default_group": "x25519"},
+    {"host": "pqc-server", "port": 8443, "name": "hybrid (preferred)",
+     "expected_posture": "not-enforced", "expected_default_group": "X25519MLKEM768"},
+    {"host": "pqc-server", "port": 8446, "name": "hybrid (strict)",
+     "expected_posture": "enforced", "expected_default_group": "X25519MLKEM768"},
+    {"host": "pqc-server", "port": 8445, "name": "pure post-quantum",
+     "expected_posture": "pq-only", "expected_default_group": "handshake_failure"}
+  ]
+}

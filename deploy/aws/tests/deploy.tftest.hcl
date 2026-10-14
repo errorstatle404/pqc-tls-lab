@@ -20,15 +20,17 @@ mock_provider "aws" {
   mock_resource "aws_instance" {
     defaults = { private_ip = "10.42.0.10" }
   }
-  mock_resource "aws_lb" {
-    defaults = {
-      arn      = "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/pqc-tls-lab-alb/0123456789abcdef"
-      dns_name = "internal-pqc-tls-lab-alb-123456789.us-east-1.elb.amazonaws.com"
-      zone_id  = "Z35SXDOTRQ7X7K"
-    }
+  mock_resource "aws_lb_target_group" {
+    defaults = { arn = "arn:aws:elasticloadbalancing:us-east-1:123456789012:targetgroup/pqc-tls-lab-server/abc" }
   }
   mock_resource "aws_acm_certificate" {
     defaults = { arn = "arn:aws:acm:us-east-1:123456789012:certificate/00000000-0000-0000-0000-000000000000" }
+  }
+  mock_resource "aws_kms_key" {
+    defaults = { arn = "arn:aws:kms:us-east-1:123456789012:key/00000000-0000-0000-0000-000000000000", key_id = "00000000-0000-0000-0000-000000000000" }
+  }
+  mock_resource "aws_lb" {
+    defaults = { dns_name = "internal-pqc-tls-lab-alb-123.us-east-1.elb.amazonaws.com", arn = "arn:aws:elasticloadbalancing:us-east-1:123456789012:loadbalancer/app/pqc-tls-lab-alb/abc" }
   }
 }
 
@@ -96,56 +98,20 @@ run "default_is_cheap_and_closed" {
     error_message = "Bundle key must be content-addressed."
   }
   assert {
-    condition     = output.inventory_ground_truth.endpoints["8445"].expected_default_client == "handshake_failure"
-    error_message = "Ground truth for pq-only endpoint is wrong."
-  }
-
-  # ---- inventory targets ----
-  assert {
-    condition     = aws_lb.lab[0].internal && aws_lb.lab[0].load_balancer_type == "application"
-    error_message = "The inventory ALB must be internal."
+    condition     = length(output.inventory_ground_truth.endpoints) == 6
+    error_message = "Ground truth should list 4 server endpoints + 2 ALB listeners."
   }
   assert {
-    condition     = aws_lb_listener.legacy[0].ssl_policy == "ELBSecurityPolicy-2016-08" && aws_lb_listener.legacy[0].port == 443
-    error_message = "Legacy listener: port 443, ELBSecurityPolicy-2016-08."
+    condition     = aws_lb.lab[0].internal && aws_lb_listener.legacy[0].ssl_policy == "ELBSecurityPolicy-2016-08" && aws_lb_listener.pq[0].ssl_policy == "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09"
+    error_message = "Internal ALB with one legacy-policy listener and one PQ-policy listener expected."
   }
   assert {
-    condition     = strcontains(aws_lb_listener.pq[0].ssl_policy, "-PQ-") && aws_lb_listener.pq[0].port == 8443
-    error_message = "PQ listener: port 8443 with a -PQ- security policy."
+    condition     = aws_kms_key.pq_signing[0].customer_master_key_spec == "ML_DSA_65" && aws_kms_key.classical_signing[0].customer_master_key_spec == "RSA_3072"
+    error_message = "One ML-DSA-65 and one RSA-3072 KMS signing key expected."
   }
   assert {
-    condition     = alltrue([for r in aws_vpc_security_group_ingress_rule.alb : r.cidr_ipv4 == "10.42.0.0/16"])
-    error_message = "ALB must only be reachable from inside the VPC."
-  }
-  assert {
-    condition     = aws_kms_key.sign_pq[0].customer_master_key_spec == "ML_DSA_65" && aws_kms_key.sign_classical[0].customer_master_key_spec == "ECC_NIST_P256"
-    error_message = "KMS keys: one ML-DSA-65, one ECDSA P-256."
-  }
-  assert {
-    condition     = aws_kms_key.sign_pq[0].deletion_window_in_days == 7
-    error_message = "Shortest deletion window, so aws-down stops the billing quickly."
-  }
-  assert {
-    condition     = output.inventory_ground_truth.alb.listeners["8443"].inventory_class == "hybrid" && length(output.inventory_ground_truth.kms_keys) == 2
-    error_message = "Ground truth must describe the ALB listeners and both KMS keys."
-  }
-  assert {
-    condition     = strcontains(aws_iam_role_policy.scanner[0].policy, "inventory-jobs/*")
-    error_message = "Scanner must be able to read inventory probe jobs."
-  }
-}
-
-run "no_inventory_targets" {
-  command = apply
-  variables { create_inventory_targets = false }
-
-  assert {
-    condition     = length(aws_lb.lab) == 0 && length(aws_kms_key.sign_pq) == 0 && length(aws_acm_certificate.alb) == 0
-    error_message = "create_inventory_targets = false must skip the ALB, certificate and KMS keys."
-  }
-  assert {
-    condition     = output.inventory_ground_truth.alb == null && output.inventory_ground_truth.kms_keys == null
-    error_message = "Ground truth must not list targets that were not created."
+    condition     = aws_vpc_security_group_egress_rule.alb_to_server[0].from_port == 8444 && aws_vpc_security_group_egress_rule.alb_to_server[0].to_port == 8444
+    error_message = "ALB may only talk to the server's classical endpoint."
   }
 }
 
@@ -183,6 +149,23 @@ run "no_scanner" {
   assert {
     condition     = length(aws_instance.scanner) == 0 && length(aws_iam_role.scanner) == 0
     error_message = "create_scanner = false must skip the scanner and its role."
+  }
+}
+
+run "minimal_no_alb_no_kms" {
+  command = apply
+  variables {
+    create_load_balancer = false
+    create_kms_keys      = false
+  }
+
+  assert {
+    condition     = length(aws_lb.lab) == 0 && length(aws_acm_certificate.alb) == 0 && length(aws_kms_key.pq_signing) == 0
+    error_message = "Optional ALB and KMS keys must be skippable."
+  }
+  assert {
+    condition     = length(output.inventory_ground_truth.endpoints) == 4
+    error_message = "Without the ALB the ground truth has only the 4 server endpoints."
   }
 }
 

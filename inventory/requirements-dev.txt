@@ -1,3 +1,3 @@
 -r requirements.txt
-pytest>=7
-moto[ec2,s3,ssm,acm,route53,cloudfront]>=5.0.28
+pytest>=8
+moto[acm,ec2,elbv2,kms,route53,cloudfront,apigatewayv2]>=5

@@ -1,0 +1,10 @@
+label	depth	subject	issuer	not_before	not_after	sig_alg	key_alg	key_bits	der_bytes
+lab-classical	0	CN=pqc-lab.local,O=PQC TLS Lab	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	Sep 24 20:33:16 2026 GMT	Dec 27 20:33:16 2028 GMT	ecdsa-with-SHA256	EC:prime256v1	256	539
+lab-classical	1	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	Sep 24 20:33:16 2026 GMT	Dec 27 20:33:16 2028 GMT	ecdsa-with-SHA256	EC:prime256v1	256	474
+lab-hybrid	0	CN=pqc-lab.local,O=PQC TLS Lab	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	Sep 24 20:33:16 2026 GMT	Dec 27 20:33:16 2028 GMT	ecdsa-with-SHA256	EC:prime256v1	256	539
+lab-hybrid	1	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	Sep 24 20:33:16 2026 GMT	Dec 27 20:33:16 2028 GMT	ecdsa-with-SHA256	EC:prime256v1	256	474
+lab-hybrid-strict	0	CN=pqc-lab.local,O=PQC TLS Lab	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	Sep 24 20:33:16 2026 GMT	Dec 27 20:33:16 2028 GMT	ecdsa-with-SHA256	EC:prime256v1	256	539
+lab-hybrid-strict	1	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	CN=PQC Lab Root CA (ecdsa),O=PQC TLS Lab	Sep 24 20:33:16 2026 GMT	Dec 27 20:33:16 2028 GMT	ecdsa-with-SHA256	EC:prime256v1	256	474
+lab-pq-only	0	CN=pqc-lab.local,O=PQC TLS Lab	CN=PQC Lab Root CA (mldsa),O=PQC TLS Lab	Sep 24 20:33:16 2026 GMT	Dec 27 20:33:16 2028 GMT	ML-DSA-65	ML-DSA-65	-	5663
+lab-pq-only	1	CN=PQC Lab Root CA (mldsa),O=PQC TLS Lab	CN=PQC Lab Root CA (mldsa),O=PQC TLS Lab	Sep 24 20:33:16 2026 GMT	Dec 27 20:33:16 2028 GMT	ML-DSA-65	ML-DSA-65	-	5598
+legacy	0	CN=legacy.lab	CN=legacy.lab	Sep 24 20:33:20 2026 GMT	Oct 14 20:33:20 2026 GMT	sha256WithRSAEncryption	rsaEncryption	2048	783

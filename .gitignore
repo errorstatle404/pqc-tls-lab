@@ -1,6 +1,6 @@
 results/*
 !results/.gitkeep
 *.pcap
-.venv/
 __pycache__/
 .pytest_cache/
+.venv/

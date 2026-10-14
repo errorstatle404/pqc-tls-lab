@@ -103,34 +103,32 @@ client/sigbench.c       signature benchmark
 scripts/run-bench.sh    scenario matrix → results/*.csv, *.md
 scripts/capture.sh      pcap for Wireshark
 docs/sample-results.md  reference run
-deploy/aws/             Terraform: VPC + server + scanner, SSM access, negotiated-group log in CloudWatch,
-                        plus inventory targets (internal ALB with legacy + PQ listeners, KMS keys)
-inventory/              crypto inventory: AWS API read + TLS probes -> report, CBOM, score
+inventory/               cryptoinv: AWS + network crypto inventory, CycloneDX CBOM, findings, scoring
+scripts/probe.sh         the network half of the inventory (five client profiles per endpoint)
+deploy/aws/              Terraform: VPC, server, scanner, ALB, KMS keys, SSM access, CloudWatch log
+```
+
+## Crypto inventory (project 2)
+
+[`inventory/`](inventory/README.md) finds the cryptography in an AWS account and on its TLS endpoints, and reports how ready it is for post-quantum cryptography. It reads the configuration through the AWS APIs, then connects to each endpoint with five client profiles to see what is actually negotiated. That includes whether "hybrid" is enforced or silently skipped. The output is a findings report plus a CycloneDX 1.6 CBOM, and it is scored against the lab's known answers.
+
+```bash
+make inventory-setup && make inventory-test   # once, then offline tests
+make inventory-local                          # inventory the Docker lab, scored against its known answers
+make inventory-public                         # what public AWS endpoints negotiate today
 ```
 
 ## Run it in AWS
 
-[`deploy/aws/`](deploy/aws/README.md) is a Terraform module that puts the server in its own VPC, behind the private DNS name `pqc-server.lab.internal`. A scanner instance in a second Availability Zone runs the same benchmarks across a real network. nginx's access log, which records the negotiated `group=` of every request, goes to CloudWatch, and the module outputs the ground truth a crypto inventory should report for each endpoint.
+[`deploy/aws/`](deploy/aws/README.md) is a Terraform module that puts the server in its own VPC, behind the private DNS name `pqc-server.lab.internal`. It also adds an internal load balancer with a legacy and a post-quantum TLS policy, and classical and ML-DSA KMS keys. A scanner instance in a second Availability Zone runs the benchmarks and the inventory from inside the VPC.
 
 ```bash
-make aws-test    # offline tests, mocked AWS provider
-make aws-up      # about 15 min until ready; roughly 8 cents an hour
-make aws-bench   # results/aws/<timestamp>/
+make aws-test       # offline tests, mocked AWS provider
+make aws-up         # about 15 min until ready; roughly 8 cents an hour
+make aws-bench      # results/aws/<timestamp>/
+make aws-inventory  # results/aws-inventory/<timestamp>/report.md
 make aws-down
 ```
-
-## Crypto inventory
-
-[`inventory/`](inventory/README.md) is a tool that finds the cryptography in an AWS account and reports what's quantum-ready. It reads the configuration through the AWS APIs (ACM certificates, load balancer TLS policies, CloudFront, KMS keys, servers with open TLS ports). It then probes every TLS endpoint as six kinds of client, because configuration alone misses the silent downgrade from finding 2. It writes a findings report and a CycloneDX 1.6 CBOM (Cryptography Bill of Materials), and scores itself against the lab's known answers.
-
-```bash
-make inventory-setup    # one-time Python environment
-make inventory-test     # unit tests
-make inventory-local    # the Docker lab: 8/8 checks against the known answers
-make inventory-public   # what AWS's own public endpoints negotiate today
-make aws-inventory      # the AWS lab (after make aws-up)
-```
-
 
 ## What it looks like on the wire
 

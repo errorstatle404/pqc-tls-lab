@@ -41,10 +41,20 @@ typedef struct {
 /* IANA TLS SignatureScheme names for the schemes this lab can produce */
 static const char *sigscheme_name(int s, char *buf, size_t n) {
     switch (s) {
+    case 0x0401: return "rsa_pkcs1_sha256";
+    case 0x0501: return "rsa_pkcs1_sha384";
+    case 0x0601: return "rsa_pkcs1_sha512";
     case 0x0403: return "ecdsa_secp256r1_sha256";
     case 0x0503: return "ecdsa_secp384r1_sha384";
+    case 0x0603: return "ecdsa_secp521r1_sha512";
     case 0x0804: return "rsa_pss_rsae_sha256";
+    case 0x0805: return "rsa_pss_rsae_sha384";
+    case 0x0806: return "rsa_pss_rsae_sha512";
     case 0x0807: return "ed25519";
+    case 0x0808: return "ed448";
+    case 0x0809: return "rsa_pss_pss_sha256";
+    case 0x080a: return "rsa_pss_pss_sha384";
+    case 0x080b: return "rsa_pss_pss_sha512";
     case 0x0904: return "mldsa44";
     case 0x0905: return "mldsa65";
     case 0x0906: return "mldsa87";
@@ -109,19 +119,21 @@ static int cmp_d(const void *a, const void *b) {
 
 static void usage(const char *argv0) {
     fprintf(stderr,
-        "usage: %s [-H] -n NAME -c HOST:PORT [-g GROUPS] [-C CAFILE] [-N ITER] [-s SNI]\n"
+        "usage: %s [-H] [-r] -n NAME -c HOST:PORT [-g GROUPS] [-C CAFILE] [-N ITER] [-s SNI]\n"
         "  -g  client group list, OpenSSL syntax (default: library default)\n"
         "  -N  handshakes to run (default 50)\n"
-        "  -H  print CSV header first\n", argv0);
+        "  -H  print CSV header first\n"
+        "  -r  after each handshake, send \"GET / HTTP/1.0\" so the server logs the request\n", argv0);
     exit(2);
 }
 
 int main(int argc, char **argv) {
     const char *name = NULL, *target = NULL, *groups = NULL, *cafile = NULL, *sni = "pqc-lab.local";
-    int iters = 50, header = 0, opt;
-    while ((opt = getopt(argc, argv, "Hn:c:g:C:N:s:")) != -1) {
+    int iters = 50, header = 0, request = 0, opt;
+    while ((opt = getopt(argc, argv, "Hrn:c:g:C:N:s:")) != -1) {
         switch (opt) {
         case 'H': header = 1; break;
+        case 'r': request = 1; break;
         case 'n': name = optarg; break;
         case 'c': target = optarg; break;
         case 'g': groups = optarg; break;
@@ -195,6 +207,14 @@ int main(int argc, char **argv) {
             char tmp[16];
             snprintf(sig, sizeof sig, "%s", sigscheme_name(st.sigscheme, tmp, sizeof tmp));
         }
+        if (request) { /* outside the timed section: only so the server logs this connection */
+            stats_t keep = st; /* byte counts stay handshake-only */
+            char req[300], sink[512];
+            int len = snprintf(req, sizeof req, "GET / HTTP/1.0\r\nHost: %s\r\nUser-Agent: hsbench\r\n\r\n", sni);
+            if (SSL_write(ssl, req, len) > 0)
+                while (SSL_read(ssl, sink, sizeof sink) > 0) {}
+            st = keep;
+        }
         SSL_shutdown(ssl);
         SSL_free(ssl);
         close(fd);
@@ -204,7 +224,7 @@ int main(int argc, char **argv) {
     if (done) {
         qsort(lat, (size_t)done, sizeof(double), cmp_d);
         med = lat[done / 2];
-        p95 = lat[(int)((done - 1) * 0.95)];
+        p95 = lat[(int)((done - 1) * 0.95 + 0.5)]; /* nearest rank */
     }
     printf("%s,%s,%s,%s,%s,%s,%s,%ld,%ld,%ld,%ld,%ld,%ld,%.3f,%.3f,%d\n",
            name, target, groups ? groups : "(default)", result, group,

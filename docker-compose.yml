@@ -31,6 +31,7 @@ services:
     volumes:
       - certs:/etc/pqc-lab/certs:ro
       - ./results:/results
+      - ./inventory/targets:/inventory/targets:ro   # target lists for `make inventory-*`
 
 volumes:
   certs:

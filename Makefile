@@ -1,6 +1,6 @@
 .PHONY: up bench bench-wan capture smoke logs shell down clean \
-        aws-test aws-up aws-status aws-smoke aws-bench aws-bench-wan aws-down \
-        inventory-setup inventory-test inventory-local inventory-public aws-inventory
+        inventory-setup inventory-test inventory-local inventory-public \
+        aws-test aws-up aws-status aws-smoke aws-bench aws-bench-wan aws-inventory aws-down
 
 N ?= 200
 DELAY_MS ?= 25
@@ -35,6 +35,26 @@ down:
 clean:         ## also removes generated certs
 	docker compose down -v
 
+# ---------------- Crypto inventory (inventory/) ----------------
+PY := inventory/.venv/bin/python
+INV := PYTHONPATH=inventory $(PY) -m cryptoinv
+
+inventory-setup:   ## one-time: Python venv with boto3, CycloneDX and test tools
+	python3 -m venv inventory/.venv
+	inventory/.venv/bin/pip install -q --upgrade pip
+	inventory/.venv/bin/pip install -q -r inventory/requirements-dev.txt
+
+inventory-test:    ## offline tests (no Docker, no AWS)
+	cd inventory && .venv/bin/python -m pytest -q
+
+inventory-local: up    ## inventory the local Docker lab, scored against its known answers
+	docker compose exec -T pqc-client probe.sh /inventory/targets/local-lab.txt /results/inventory/local
+	$(INV) report --probes results/inventory/local --ground-truth inventory/ground-truth-local.json --out results/inventory-report/local
+
+inventory-public: up   ## what do public AWS endpoints (KMS, S3, STS...) negotiate today?
+	docker compose exec -T pqc-client probe.sh /inventory/targets/public-aws.txt /results/inventory/public
+	$(INV) report --probes results/inventory/public --out results/inventory-report/public
+
 # ---------------- AWS (deploy/aws, Terraform) ----------------
 TF ?= terraform
 AWS_DIR := deploy/aws
@@ -59,27 +79,8 @@ aws-bench:     ## full scenario matrix over the VPC; results synced to results/a
 aws-bench-wan: ## same, with DELAY_MS extra per round trip on top of the real network
 	TF=$(TF) $(AWS_DIR)/bench.sh bench-wan
 
-aws-inventory: ## crypto inventory of the AWS account: API read + probes from the scanner, scored
-	TF=$(TF) $(PYINV) aws --tf-dir $(AWS_DIR) --out results/inventory-report/aws
+aws-inventory: ## AWS config + probes from inside the VPC -> results/aws-inventory/<time>/report.md
+	TF=$(TF) PY=$(PY) $(AWS_DIR)/inventory.sh
 
 aws-down:      ## destroy everything, including the S3 bucket and log group
 	$(TF) -chdir=$(AWS_DIR) destroy
-
-# ---------------- Crypto inventory (inventory/, Python) ----------------
-VENV  ?= .venv
-PYINV := PYTHONPATH=inventory $(VENV)/bin/python -m pqcinv
-
-inventory-setup:  ## one-time: Python environment for the inventory tool (about 2 min)
-	python3 -m venv $(VENV)
-	$(VENV)/bin/python -m pip install -q --upgrade pip
-	$(VENV)/bin/python -m pip install -q -r inventory/requirements-dev.txt
-	@echo "inventory tool ready: $$($(PYINV) --version)"
-
-inventory-test:   ## unit tests: no network, Docker or AWS account needed
-	cd inventory && ../$(VENV)/bin/python -m pytest -q
-
-inventory-local: up  ## inventory the Docker lab and score it against the known answers
-	$(PYINV) local --out results/inventory-report/local
-
-inventory-public: up ## what AWS's own public endpoints negotiate today (probes from the client container)
-	$(PYINV) public --out results/inventory-report/public

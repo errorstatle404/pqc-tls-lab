@@ -67,7 +67,7 @@ COPY --from=build /usr/local/bin/hsbench /usr/local/bin/sigbench /usr/local/bin/
 RUN ln -s /opt/openssl/bin/openssl /usr/local/bin/openssl
 
 COPY server/nginx.conf /etc/nginx/nginx.conf
-COPY server/gen-certs.sh server/entrypoint.sh scripts/run-bench.sh scripts/capture.sh /usr/local/bin/
+COPY server/gen-certs.sh server/entrypoint.sh scripts/run-bench.sh scripts/capture.sh scripts/probe.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/*.sh
 
 # Fail the build loudly if the PQC algorithms are not actually available.
