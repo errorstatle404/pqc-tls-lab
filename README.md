@@ -118,6 +118,8 @@ make inventory-local                          # inventory the Docker lab, scored
 make inventory-public                         # what public AWS endpoints negotiate today
 ```
 
+October 2026 results for public AWS endpoints: [What public AWS endpoints negotiate today](inventory/README.md#what-public-aws-endpoints-negotiate-today-oct-2026).
+
 ## Run it in AWS
 
 [`deploy/aws/`](deploy/aws/README.md) is a Terraform module that puts the server in its own VPC, behind the private DNS name `pqc-server.lab.internal`. It also adds an internal load balancer with a legacy and a post-quantum TLS policy, and classical and ML-DSA KMS keys. A scanner instance in a second Availability Zone runs the benchmarks and the inventory from inside the VPC.

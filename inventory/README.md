@@ -69,6 +69,37 @@ The profiles combine into one posture per endpoint:
 
 Severity reflects migration priority. Key exchange comes first because recorded traffic can be decrypted later. Authentication comes later because a forged signature only matters once a quantum computer exists.
 
+## What public AWS endpoints negotiate today (Oct 2026)
+
+Results of `make inventory-public` on 2026-10-14 (OpenSSL 3.5.4, from the Docker lab). Ten AWS service endpoints were probed in us-east-1 (IAM is global), plus CloudFront and two non-AWS reference sites.
+
+**12 of 13 endpoints negotiated hybrid X25519MLKEM768 and enforced it.** A client that supports hybrid but leads with a classical X25519 share is sent a HelloRetryRequest and still ends up on hybrid. **Lambda** was the exception. It offered classical X25519 only, and a hand recheck on 2026-10-19 showed the same in us-east-1 and us-east-2. When a client offers only the hybrid group, Lambda does not refuse it. It falls back to TLS 1.2 with `TLS_RSA_WITH_AES_128_GCM_SHA256`: static RSA key exchange, with no forward secrecy.
+
+| Endpoint | Default client got | PQ key exchange | TLS 1.0/1.1 |
+|---|---|---|---|
+| `acm.us-east-1.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `aws.amazon.com` (CloudFront) | X25519MLKEM768 | hybrid, enforced | no |
+| `dynamodb.us-east-1.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `ec2.us-east-1.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `iam.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `kms-fips.us-east-1.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `kms.us-east-1.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `lambda.us-east-1.amazonaws.com` | X25519 | none | no |
+| `s3.us-east-1.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `secretsmanager.us-east-1.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `sts.us-east-1.amazonaws.com` | X25519MLKEM768 | hybrid, enforced | no |
+| `www.cloudflare.com` (reference) | X25519MLKEM768 | hybrid, enforced | no |
+| `www.google.com` (reference) | X25519MLKEM768 | hybrid, enforced | TLS 1.0, TLS 1.1 |
+
+Every endpoint except `aws.amazon.com` also accepts TLS 1.2, which always uses classical key exchange. All certificates seen use classical keys (RSA-2048 on AWS, EC P-256 on the reference sites).
+
+Caveats:
+
+- This is a point-in-time snapshot from one vantage point with one TLS library. It covers the listed endpoints only and says nothing about AWS as a whole, other regions or other services.
+- The certificate capture for `aws.amazon.com` is incomplete: no chain was recorded, and TLS 1.2 shows as not accepted. This is a known gap in the probe, so treat that row's TLS 1.2 and certificate data as unknown.
+
+To reproduce: `make inventory-public` (report in `results/inventory-report/public/report.md`).
+
 ## How the AWS run works
 
 ```
